@@ -1,20 +1,3 @@
-/*
-
-* Author: Texas Instruments
-
-* Editted by: Saurav Shandilya, Vishwanathan Iyer
-	      ERTS Lab, CSE Department, IIT Bombay
-
-* Description: This code will test file to check software and hardware setup. This code will blink three colors of RGB LED present of Launchpad board in sequence.
-
-* Filename: lab-0.c
-
-* Functions: setup(), led_pin_config(), main()
-
-* Global Variables: none
-
-*/
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -26,7 +9,6 @@
 #include "inc/hw_gpio.h"
 #include <time.h>
 
-
 void onSW1ButtonDown(void);
 void onSW1ButtonUp(void);
 void onSW2ButtonDown(void);
@@ -34,10 +16,10 @@ void onSW2ButtonUp(void);
 
 uint8_t ui8LED = 2;
 uint8_t sw2Status = 0;
-uint32_t delay_500ms = 6700000;
-uint8_t delay = 1;
+uint32_t delay_500ms = 6700000;	// Delay worth 500ms
+uint8_t delay = 1;				// Delay multiplier
 
-
+// Interrupt handler for all button down
 void onButtonDown(void) {
     if (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_4) {
         onSW1ButtonDown();
@@ -46,6 +28,7 @@ void onButtonDown(void) {
     }
 }
 
+// Interrupt handler for all button up
 void onButtonUp(void) {
     if (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_4) {
         onSW1ButtonUp();
@@ -55,64 +38,54 @@ void onButtonUp(void) {
 }
 
 void onSW2ButtonDown(void) {
-        // PF4 was interrupt cause
-        //printf("Button Down\n");
+	// PF4 was interrupt cause
+	GPIOIntRegister(GPIO_PORTF_BASE, onButtonUp);   				// Register our handler function for port F
+	GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_RISING_EDGE);  // Configure PF4 for rising edge trigger
+	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);  					// Clear interrupt flag
 
-		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, ui8LED);
-        GPIOIntRegister(GPIO_PORTF_BASE, onButtonUp);   // Register our handler function for port F
-        GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_RISING_EDGE);          // Configure PF4 for rising edge trigger
-        GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);  // Clear interrupt flag
-
-		if (ui8LED == 8)
-		{
-			ui8LED = 2;
-		}
-		else
-		{
-			ui8LED = ui8LED*2;
-		}
+	// Set led light
+	if (ui8LED == 8)
+	{
+		ui8LED = 2;
+	}
+	else
+	{
+		ui8LED = ui8LED*2;
+	}
 }
 
 void onSW2ButtonUp(void) {
-        // PF4 was interrupt cause
-        //printf("Button Up\n");
-		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
-        GPIOIntRegister(GPIO_PORTF_BASE, onButtonDown); // Register our handler function for port F
-        GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_FALLING_EDGE);         // Configure PF4 for falling edge trigger
-        GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);  // Clear interrupt flag
+	// PF4 was interrupt cause
+	GPIOIntRegister(GPIO_PORTF_BASE, onButtonDown); 				// Register our handler function for port F
+	GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_FALLING_EDGE);	// Configure SW2 for falling edge trigger
+	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);  					// Clear interrupt flag
 }
 
 
 
 void onSW1ButtonDown(void) {
-        // PF4 was interrupt cause
-        //printf("Button Down\n");
+	// PF4 was interrupt cause
+	GPIOIntRegister(GPIO_PORTF_BASE, onButtonUp);   				// Register our handler function for port F
+	GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_RISING_EDGE);	// Configure SW1 for rising edge trigger
+	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4);  					// Clear interrupt flag
 
-		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 8);
-        GPIOIntRegister(GPIO_PORTF_BASE, onButtonUp);   // Register our handler function for port F
-        GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_RISING_EDGE);          // Configure PF4 for rising edge trigger
-        GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4);  // Clear interrupt flag
-
-
-		if (delay == 4)
-		{
-			delay = 1;
-		}
-		else
-		{
-			delay = delay*2;
-		}
+	// Circulate over delays
+	if (delay == 4)
+	{
+		delay = 1;
+	}
+	else
+	{
+		delay = delay*2;
+	}
 }
 
 void onSW1ButtonUp(void) {
-        // PF4 was interrupt cause
-        //printf("Button Up\n");
+	// PF4 was interrupt cause
 	sw2Status++;
-		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3, 0);
-
-        GPIOIntRegister(GPIO_PORTF_BASE, onButtonDown); // Register our handler function for port F
-        GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_FALLING_EDGE);         // Configure PF4 for falling edge trigger
-        GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4);  // Clear interrupt flag
+	GPIOIntRegister(GPIO_PORTF_BASE, onButtonDown); 				// Register our handler function for port F
+	GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_FALLING_EDGE);	// Configure PF4 for falling edge trigger
+	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4);  					// Clear interrupt flag
 }
 
 /*
@@ -131,9 +104,7 @@ void onSW1ButtonUp(void) {
 void setup(void)
 {
 	SysCtlClockSet(SYSCTL_SYSDIV_4|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
-    //SysCtlClockSet(SYSCTL_SYSDIV_2_5| SYSCTL_USE_PLL | SYSCTL_OSC_INT | SYSCTL_XTAL_16MHZ);
-
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);	// Enable port F
 
     //
     // Unlock PF0 so we can change it to a GPIO input
@@ -144,35 +115,19 @@ void setup(void)
     HWREG(GPIO_PORTF_BASE + GPIO_O_CR) |= 0x01;
     HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = 0;
 
-    // Pin F4 setup
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);        // Enable port F
-    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);  // Init PF4 as input
-    //GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0);  // Init PF0 as input
-    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);  // Enable weak pullup resistor for PF4
-    // Pin F0 setup
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);        // Enable port F
+    // Init PF4 and PF0 as input
+    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);
+    // Enable weak pullup resistor for PF4
+    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    // Interrupt setup sw1 PF4 & sw2 PF0
+    GPIOIntDisable(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);	// Disable interrupt for PF4 & PF0 (in case it was enabled)
+    GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);		// Clear pending interrupts for PF4 & PF0
 
-    //GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);  // Enable weak pullup resistor for PF4
+    GPIOIntRegister(GPIO_PORTF_BASE, onButtonDown);     		// Register handler function for port F
 
-    // Interrupt setup sw1 PF4
-    GPIOIntDisable(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);        // Disable interrupt for PF4 (in case it was enabled)
-    GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);      // Clear pending interrupts for PF4
-    // Interrupt setup sw2 PF0
-    //GPIOIntDisable(GPIO_PORTF_BASE, GPIO_PIN_0);        // Disable interrupt for PF4 (in case it was enabled)
-    //GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);      // Clear pending interrupts for PF4
-
-    GPIOIntRegister(GPIO_PORTF_BASE, onButtonDown);     // Register our handler function for port F
-
-    GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0, GPIO_FALLING_EDGE);             // Configure PF4 for falling edge trigger
-    GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);     // Enable interrupt for PF4
-    //GPIOIntRegister(GPIO_PORTF_BASE, onSW2ButtonDown);     // Register our handler function for port F
-    //GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_FALLING_EDGE);             // Configure PF4 for falling edge trigger
-    //GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_0);     // Enable interrupt for PF4
-
-
-
-
-
+    // Configure PF4 & PF0 for falling edge trigger
+    GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0, GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_0);	// Enable interrupt for PF4 & PF0
 }
 
 /*
