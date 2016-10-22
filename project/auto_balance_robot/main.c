@@ -43,19 +43,22 @@
 #define PID_KI					0
 #define PID_KD					2
 */
-double pidKP_anglePid					=23; //30;
-double pidKI_anglePid					=2; //150;
+double pidKP_anglePid					=20; //30;
+double pidKI_anglePid					=3; //150;
 double pidKD_anglePid					=0.3; //0.3;
 
-double pidKP_posPid					= 0.01;
-double pidKI_posPid					= 0.0;
-double pidKD_posPid					= 0.003;
+double pidKP_posPid					= 0.03;	// base value is 0.04, must be neaby this value
+double pidKI_posPid					= 0.000;//1;
+double pidKD_posPid					= 0.001;//3;
 
-double pidKP_velPid					= 2;
-double pidKI_velPid					= 0.1;
-double pidKD_velPid					= 0;//0.1;//20;
+double pidKP_velPid					= 0.01;
+double pidKI_velPid					= 0.0000000;
+double pidKD_velPid					= 0.0000000;//0.1;//20;
 
 bool botStarted = false;
+
+MedFilter mf_vel;
+MedFilter mf_angle;
 
 double bot_velocity = 0;
 int calculate_velocity() {
@@ -63,11 +66,20 @@ int calculate_velocity() {
 	static int lastTime = 0;
 	uint32_t nowPosition = get_position();
 	int nowTime = millis();
+/*
+	if (abs((int)nowPosition - (int)lastPosition)/350 > 822611239)
+		return bot_velocity;*/
 
-	bot_velocity = ((double)nowPosition - (double)lastPosition) * 1000.0 / ((double)nowTime - (double)lastTime);
+	if (nowTime > lastTime)	// Calculate only for valid interval
+		bot_velocity = ((double)nowPosition - (double)lastPosition)*1000.0 / ((double)nowTime - (double)lastTime);
+/*
+	if (bot_velocity > 57913934)
+		return bot_velocity;*/
 
 	lastPosition = nowPosition;
 	lastTime = nowTime;
+
+	bot_velocity = medfilter(&mf_vel, bot_velocity);
 
 	return bot_velocity;
 }
@@ -164,7 +176,7 @@ double getAngleAcc() {
 	//int16_t ay = -MPU9250_read_int16(ACCEL_YOUT_H);
 	int16_t az =  MPU9250_read_int16(ACCEL_ZOUT_H);
 
-	return medfilter( ((-atan((double)ax/(double)az)) * 7.0 * 180.0 * ANGLE_SCALING_FACTOR)/22.0 ); // subtraction of offset at the end
+	return medfilter( &mf_angle, ((-atan((double)ax/(double)az)) * 7.0 * 180.0 * ANGLE_SCALING_FACTOR)/22.0 ); // subtraction of offset at the end
 }
 
 void checkBotStability() {
@@ -253,20 +265,38 @@ void main () {
 	uint64_t dt, lastTime;	// in milli sec
 
 	PID angle_pid = PID_construct(&pidInput_anglePid, &pidOutput_anglePid , &pidSetpoint_anglePid, pidKP_anglePid, pidKI_anglePid, pidKD_anglePid, DIRECT);
-	PID pos_pid = PID_construct(&pidInput_posPid, &pidOutput_posPid, &pidSetpoint_posPid, pidKP_posPid, pidKI_posPid, pidKD_posPid, DIRECT);
-	PID vel_pid = PID_construct(&pidInput_velPid, &pidOutput_velPid, &pidSetpoint_velPid, pidKP_velPid, pidKI_velPid, pidKD_velPid, DIRECT);
+	PID pos_pid = PID_construct(&pidInput_posPid, &pidOutput_posPid, &pidSetpoint_posPid, pidKP_posPid, pidKI_posPid, pidKD_posPid, REVERSE);
+	PID vel_pid = PID_construct(&pidInput_velPid, &pidOutput_velPid, &pidSetpoint_velPid, pidKP_velPid, pidKI_velPid, pidKD_velPid, REVERSE);
 
 
 	SetOutputLimits(&angle_pid, -180 * ANGLE_SCALING_FACTOR, 180 * ANGLE_SCALING_FACTOR);
 	SetOutputLimits(&pos_pid, -300, 300);
-	SetOutputLimits(&vel_pid, -180 * ANGLE_SCALING_FACTOR, 180 * ANGLE_SCALING_FACTOR);
+	SetOutputLimits(&vel_pid, -500, 500);
 	SysCtlClockSet(SYSCTL_SYSDIV_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 
 	init_uart();
     InitMotor();
 	InitI2C0();
 	init_qencoder();
+	 InitMedFilter(&mf_angle);
+	 InitMedFilter(&mf_vel);
 
+/*
+	QEIPositionSet(QEI1_BASE, QENCODER_START);
+	while(1) {
+		static uint32_t val=0, nval=0;
+
+		nval = QEIPositionGet(QEI1_BASE);
+		//if (nval!=val) {
+			UART_reset_outbuf();
+			UART_print_int(nval);
+			UART_print_int(((double)nval-(double)val)/10);
+			UART_print_int(calculate_velocity());
+			UART_flush();
+		//}
+		val = nval;
+		SysCtlDelay(900000);
+	}*/
 	/*PWMPulseWidthSet(PWM1_BASE, PWM_OUT_6, 1);
 	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_7, 1);
 	while(1){
@@ -383,12 +413,14 @@ void main () {
 				scale(pidOutput_posPid, -300, 300, pidKP_anglePid, pidKP_anglePid*2),
 				pidKI_anglePid,
 				scale(pidOutput_posPid, -300, 300, pidKD_anglePid, pidKD_anglePid*1.8));*/
-		pidSetpoint_anglePid = ANGLE_OFFSET ;//- pidOutput_posPid;
-		Compute(&angle_pid);
-		pidInput_velPid = bot_velocity;
-		pidSetpoint_velPid = scale(pidOutput_anglePid, -180*ANGLE_SCALING_FACTOR , 180*ANGLE_SCALING_FACTOR , -(double)MOTOR_MAX_SPEED , (double)MOTOR_MAX_SPEED );
 
-		if(botStarted && Compute(&vel_pid)) {
+		pidInput_velPid = bot_velocity;
+		pidSetpoint_velPid = 0;
+		Compute(&vel_pid);
+
+		pidSetpoint_anglePid = ANGLE_OFFSET + pidOutput_posPid + pidOutput_velPid;
+
+		if(botStarted && Compute(&angle_pid)) {
 			double load = scale(pidOutput_anglePid , -180*ANGLE_SCALING_FACTOR , 180*ANGLE_SCALING_FACTOR , -(double)ui32Load , (double)ui32Load );
 			//double load = scale(pidOutput_velPid ,-(double)MOTOR_MAX_SPEED , (double)MOTOR_MAX_SPEED , -(double)ui32Load , (double)ui32Load );
 			uint32_t pwm_out = fabs(load);
@@ -397,11 +429,15 @@ void main () {
 			//UART_print_int(angle_pid.dispKp);
 			//UART_print_int(pidOutput_posPid);
 			//UART_print_int(pidOutput_anglePid);
-			UART_print_int(load);
+			//UART_print_int(load);
 			UART_print_int(pidOutput_posPid);
+			UART_print_int(pidOutput_velPid);
 			UART_print_int(pidSetpoint_anglePid);
-			UART_print_int(angle_gyro);
 			//UART_print_int(pidOutput_velPid);
+			//UART_print_int(bot_velocity);
+			//UART_print_int(pidInput_posPid);
+			//UART_print_int(angle_gyro);
+			//UART_print_int(bot_velocity);
 			//UART_print_int(angle_gyro_raw/6800);
 			//UART_print_int(Output>0?pwm_out:-(int)(pwm_out));
 

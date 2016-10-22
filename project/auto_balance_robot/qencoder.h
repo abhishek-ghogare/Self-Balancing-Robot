@@ -19,8 +19,8 @@
 #include "driverlib/gpio.h"
 #include "driverlib/qei.h"
 
-#define QENCODER_MAX			2147483647	// Max value of the encoder
-#define QENCODER_START			1073741823	// Starting point of the encoder, set to mid of the max
+#define QENCODER_MAX			1000000	// Max value of the encoder
+#define QENCODER_START			500000	// Starting point of the encoder, set to mid of the max
 
 void init_qencoder();
 int32_t get_position();

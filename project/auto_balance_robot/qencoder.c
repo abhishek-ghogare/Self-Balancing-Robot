@@ -52,5 +52,5 @@ void init_qencoder() {
 }
 
 int32_t get_position() {
-	return (int32_t)QEIPositionGet(QEI1_BASE) - (int32_t)QENCODER_START;
+	return ((int32_t)QEIPositionGet(QEI1_BASE) - (int32_t)QENCODER_START);
 }
