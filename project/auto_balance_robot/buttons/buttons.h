@@ -8,20 +8,10 @@
 #ifndef LAB2_BUTTONS_H_
 #define LAB2_BUTTONS_H_
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_types.h"
-#include "inc/hw_memmap.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/gpio.h"
-#include "inc/hw_gpio.h"
-#include <time.h>
 //#include "inc/tm4c123gh6pm.h" // Commenting this include, it was causing comflict with hw_int.h
 // #define INT_TIMER0A             35          // Defined in the C file which was declared in above header file
 
-#include "driverlib/interrupt.h"
-#include "driverlib/timer.h"
+#include "../common.h"
 
 void btn_initialize();
 

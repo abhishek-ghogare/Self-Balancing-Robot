@@ -1,35 +1,8 @@
-/*
- * i2c.h
- *
- *  Created on: Oct 12, 2016
- *      Author: Thor
- */
-
-#ifndef I2C_H_
-#define I2C_H_
-
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include "inc/hw_i2c.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_gpio.h"
-#include "driverlib/i2c.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/pwm.h"
-#include "driverlib/pin_map.h"
-#include "inc/hw_gpio.h"
-
-
-#include "mpu_9250.h"
-
+#include "i2c.h"
 
 //initialize I2C module 0
 //Slightly modified version of TI's example code
-void InitI2C0(void)
+void I2C_init_I2C0(void)
 {
     //enable I2C module 0
     SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
@@ -229,5 +202,3 @@ uint32_t I2CReceive(uint32_t slave_addr, uint8_t reg)
     return I2CMasterDataGet(I2C0_BASE);
 }
 
-
-#endif /* I2C_H_ */

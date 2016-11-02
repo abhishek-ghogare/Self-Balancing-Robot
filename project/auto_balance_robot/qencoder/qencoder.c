@@ -1,6 +1,6 @@
 #include "qencoder.h"
 
-void init_qencoder() {
+void QE_init_qencoder() {
 	// Enable QEI Peripherals
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
@@ -9,7 +9,7 @@ void init_qencoder() {
 
 	//Unlock GPIOD7 - Like PF0 its used for NMI - Without this step it doesn't work
 	HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY; //In Tiva include this is the same as "_DD" in older versions (0x4C4F434B)
-	HWREG(GPIO_PORTD_BASE + GPIO_O_CR) |= 0x80;
+	HWREG(GPIO_PORTD_BASE + GPIO_O_CR)  |= 0x80;
 	HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0;
 
 	//Set Pins to be PHA0 PHB0 PHA1 PHB1
@@ -40,17 +40,30 @@ void init_qencoder() {
 	QEIPositionSet(QEI0_BASE, QENCODER_START);
 	QEIPositionSet(QEI1_BASE, QENCODER_START);
 
-	/*
-	//Add qeiPosition as a watch expression to see the value inc/dec
-	while (1) //This is the main loop of the program
-	{
-		qeiPosition = QEIPositionGet(QEI0_BASE);
-		qeiPosition = QEIPositionGet(QEI1_BASE);
-		SysCtlDelay (1000);
-	}
-	*/
+	MF_init_med_filter(&mf_vel);
 }
 
-int32_t get_position() {
+int32_t QE_get_position() {
 	return ((int32_t)QEIPositionGet(QEI1_BASE) - (int32_t)QENCODER_START);
+}
+
+int QE_get_speed() {
+	double bot_velocity = 0;
+	static uint32_t lastPosition = QENCODER_START;
+	static int lastTime = 0;
+	uint32_t nowPosition = QE_get_position();
+	int nowTime = millis();
+
+	if (nowTime > lastTime)	// Calculate only for valid interval
+		bot_velocity = ((double)nowPosition - (double)lastPosition)*1000.0 / ((double)nowTime - (double)lastTime);
+
+	lastPosition = nowPosition;
+	lastTime = nowTime;
+
+	// Very high spikes because of encoder calculation faults
+	// So, need to filter calculated velocity,
+	// Filtering stopped very strong vibrations that used to occur for around every 500ms
+	bot_velocity = MF_med_filter(&mf_vel, bot_velocity);
+
+	return bot_velocity;
 }

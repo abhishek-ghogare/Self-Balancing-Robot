@@ -4,36 +4,7 @@
  *
  * This Library is licensed under a GPLv3 License
  **********************************************************************************************/
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include "inc/hw_i2c.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_gpio.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/pwm.h"
-#include "driverlib/pin_map.h"
-#include "inc/hw_gpio.h"
-#include "driverlib/rom.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_types.h"
-#include "inc/hw_memmap.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/gpio.h"
-#include "inc/tm4c123gh6pm.h"
-#include "driverlib/debug.h"
-#include "driverlib/pin_map.h"
-#include "inc/hw_gpio.h"
-#include "driverlib/adc.h"
-#include "driverlib/rom.h"
-#include "inc/hw_nvic.h"
-#include "inc/hw_memmap.h"
-
-#include "PID_v1.h"
+#include "pid.h"
 
 void Initialize(PID * pidp);
 
@@ -69,18 +40,18 @@ PID PID_construct(double* Input, double* Output, double* Setpoint,
 
 	EnableTiming();
 
-    pid.myOutput = Output;
-    pid.myInput = Input;
-    pid.mySetpoint = Setpoint;
+    pid.output = Output;
+    pid.input = Input;
+    pid.setpoint = Setpoint;
     pid.inAuto = 0;
 	
-	SetOutputLimits(&pid, 0, 255);				//default output limit corresponds to
+	PID_setOutputLimits(&pid, 0, 255);				//default output limit corresponds to
 												//the arduino pwm limits
 
 	pid.SampleTime = 10;							//default Controller Sample Time is 0.1 seconds
 
-    SetControllerDirection(&pid, ControllerDirection);
-    SetTunings(&pid, Kp, Ki, Kd);
+    PID_setControllerDirection(&pid, ControllerDirection);
+    PID_setTunings(&pid, Kp, Ki, Kd);
 
     pid.lastTime = millis()-pid.SampleTime;
 
@@ -94,7 +65,7 @@ PID PID_construct(double* Input, double* Output, double* Setpoint,
  *   pid Output needs to be computed.  returns true when the output is computed,
  *   false when nothing has been done.
  **********************************************************************************/ 
-int Compute(PID * pidp)
+int PID_compute(PID * pidp)
 {
    if(!pidp->inAuto) return 0;
    unsigned long now = millis();
@@ -102,8 +73,8 @@ int Compute(PID * pidp)
    if(timeChange>=pidp->SampleTime)
    {
       /*Compute all the working error variables*/
-	  double input = *(pidp->myInput);
-      double error = *(pidp->mySetpoint) - input;
+	  double input = *(pidp->input);
+      double error = *(pidp->setpoint) - input;
       pidp->ITerm+= (pidp->ki * error);
       if(pidp->ITerm > pidp->outMax) pidp->ITerm= pidp->outMax;
       else if(pidp->ITerm < pidp->outMin) pidp->ITerm= pidp->outMin;
@@ -114,7 +85,7 @@ int Compute(PID * pidp)
       
 	  if(output > pidp->outMax) output = pidp->outMax;
       else if(output < pidp->outMin) output = pidp->outMin;
-	  *(pidp->myOutput) = output;
+	  *(pidp->output) = output;
 	  
       /*Remember some variables for next time*/
 	  pidp->lastInput = input;
@@ -130,7 +101,7 @@ int Compute(PID * pidp)
  * it's called automatically from the constructor, but tunings can also
  * be adjusted on the fly during normal operation
  ******************************************************************************/ 
-void SetTunings(PID *pidp, double Kp, double Ki, double Kd)
+void PID_setTunings(PID *pidp, double Kp, double Ki, double Kd)
 {
    if (Kp<0 || Ki<0 || Kd<0) return;
  
@@ -141,7 +112,7 @@ void SetTunings(PID *pidp, double Kp, double Ki, double Kd)
    pidp->ki = Ki * SampleTimeInSec;
    pidp->kd = Kd / SampleTimeInSec;
  
-  if(pidp->controllerDirection == REVERSE)
+  if(pidp->controllerDirection == PID_REVERSE)
    {
 	  pidp->kp = (0 - pidp->kp);
 	  pidp->ki = (0 - pidp->ki);
@@ -172,7 +143,7 @@ void SetSampleTime(PID *pidp, int NewSampleTime)
  *  want to clamp it from 0-125.  who knows.  at any rate, that can all be done
  *  here.
  **************************************************************************/
-void SetOutputLimits(PID *pidp, double Min, double Max)
+void PID_setOutputLimits(PID *pidp, double Min, double Max)
 {
    if(Min >= Max) return;
    pidp->outMin = Min;
@@ -180,8 +151,8 @@ void SetOutputLimits(PID *pidp, double Min, double Max)
  
    if(pidp->inAuto)
    {
-	   if(*(pidp->myOutput) > pidp->outMax) *(pidp->myOutput) = pidp->outMax;
-	   else if(*(pidp->myOutput) < pidp->outMin) *(pidp->myOutput) = pidp->outMin;
+	   if(*(pidp->output) > pidp->outMax) *(pidp->output) = pidp->outMax;
+	   else if(*(pidp->output) < pidp->outMin) *(pidp->output) = pidp->outMin;
 	 
 	   if(pidp->ITerm > pidp->outMax) pidp->ITerm = pidp->outMax;
 	   else if(pidp->ITerm < pidp->outMin) pidp->ITerm = pidp->outMin;
@@ -193,9 +164,9 @@ void SetOutputLimits(PID *pidp, double Min, double Max)
  * when the transition from manual to auto occurs, the controller is
  * automatically initialized
  ******************************************************************************/ 
-void SetMode(PID *pidp, int Mode)
+void PID_setMode(PID *pidp, int Mode)
 {
-    int newAuto = (Mode == AUTOMATIC);
+    int newAuto = (Mode == PID_AUTOMATIC);
     if(newAuto == !pidp->inAuto)
     {  /*we just went from manual to auto*/
         Initialize(pidp);
@@ -209,8 +180,8 @@ void SetMode(PID *pidp, int Mode)
  ******************************************************************************/ 
 void Initialize(PID *pidp)
 {
-	pidp->ITerm = *(pidp->myOutput);
-	pidp->lastInput = *(pidp->myInput);
+	pidp->ITerm = *(pidp->output);
+	pidp->lastInput = *(pidp->input);
 	if(pidp->ITerm > pidp->outMax) pidp->ITerm = pidp->outMax;
 	else if(pidp->ITerm < pidp->outMin) pidp->ITerm = pidp->outMin;
 }
@@ -221,7 +192,7 @@ void Initialize(PID *pidp)
  * know which one, because otherwise we may increase the output when we should
  * be decreasing.  This is called from the constructor.
  ******************************************************************************/
-void SetControllerDirection(PID *pidp, int Direction)
+void PID_setControllerDirection(PID *pidp, int Direction)
 {
    if(pidp->inAuto && Direction != pidp->controllerDirection)
    {

@@ -1,14 +1,7 @@
-/*
- * mpu_9250.h
- *
- *  Created on: Oct 8, 2016
- *      Author: Thor
- */
-
 #ifndef MPU_9250_H_
 #define MPU_9250_H_
 
-#include "i2c.h"
+#include "i2c/i2c.h"
 
 /* MPU9250 Basic Example Code
  by: Kris Winer
