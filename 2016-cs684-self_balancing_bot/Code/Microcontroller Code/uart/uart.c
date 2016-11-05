@@ -1,3 +1,19 @@
+/*
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: uart.c
+* Functions			: void 		UART_int_handler(),
+* 				  	  void 		UART_init(),
+* 				  	  void 		UART_echo_string(char []),
+* 				  	  void 		UART_reset_outbuf(),
+* 				  	  void 		UART_print_int(int),
+* 				  	  void 		UART_flush()
+* Global Variables	: char 		output[200],
+* 					  int 		i
+*
+*/
+
 #include "uart.h"
 
 char output[200];

@@ -1,4 +1,13 @@
-/* medfilt_new.c    Median filter in C*/
+/*
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: medfilter.h
+* Functions			: void 	MF_init_med_filter (MedFilter *mf),
+* 				  	  int 	MF_med_filter(MedFilter *mf, int inValue)
+* Global Variables	: None
+*
+*/
 
 #include <stdio.h>
 #include <limits.h>

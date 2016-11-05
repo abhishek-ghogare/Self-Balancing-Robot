@@ -1,9 +1,13 @@
 /*
- * medfilter.h
- *
- *  Created on: Oct 18, 2016
- *      Author: Thor
- */
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: medfilter.h
+* Functions			: void 	MF_init_med_filter (MedFilter *mf),
+* 				  	  int 	MF_med_filter(MedFilter *mf, int inValue)
+* Global Variables	: None
+*
+*/
 
 #ifndef MEDFILTER_H_
 #define MEDFILTER_H_

@@ -1,9 +1,16 @@
 /*
- * motor.h
- *
- *  Created on: Nov 2, 2016
- *      Author: Thor
- */
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: motor.h
+* Functions			: void 	MOT_init_motor(),
+* 				  	  void 	MOT_stop(),
+* 				  	  void 	MOT_forward(),
+* 				  	  void 	MOT_reverse(),
+* 				  	  void 	MOT_setSpeed(int32_t load)
+* Global Variables	: uint32_t MOT_pwm_load, MOT_ui32PWMClock
+*
+*/
 
 #ifndef MOTOR_H_
 #define MOTOR_H_

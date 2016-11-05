@@ -1,3 +1,17 @@
+/*
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: buttons.h
+* Functions			: void btn_initialize()
+* Global Variables	: void (*btn_onSW1ButtonDownHdr)(void);
+*					  void (*btn_onSW1ButtonUpHdr)(void);
+*					  void (*btn_onSW2ButtonDownHdr)(void);
+*					  void (*btn_onSW2ButtonUpHdr)(void);
+*					  char btn_sw1_state, btn_sw2_state
+*
+*/
+
 #include "buttons.h"
 
 

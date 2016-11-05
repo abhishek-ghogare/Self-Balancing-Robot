@@ -1,9 +1,17 @@
 /*
- * uart.h
- *
- *  Created on: Oct 14, 2016
- *      Author: Thor
- */
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: uart.h
+* Functions			: void 		UART_int_handler(),
+* 				  	  void 		UART_init(),
+* 				  	  void 		UART_echo_string(char []),
+* 				  	  void 		UART_reset_outbuf(),
+* 				  	  void 		UART_print_int(int),
+* 				  	  void 		UART_flush()
+* Global Variables	: None
+*
+*/
 
 #ifndef UART_UART_H_
 #define UART_UART_H_

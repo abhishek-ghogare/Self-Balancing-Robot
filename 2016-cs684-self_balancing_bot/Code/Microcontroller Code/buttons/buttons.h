@@ -1,9 +1,16 @@
 /*
- * buttons.h
- *
- *  Created on: Aug 10, 2016
- *      Author: Thor
- */
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: buttons.h
+* Functions			: void btn_initialize()
+* Global Variables	: void (*btn_onSW1ButtonDownHdr)(void);
+*					  void (*btn_onSW1ButtonUpHdr)(void);
+*					  void (*btn_onSW2ButtonDownHdr)(void);
+*					  void (*btn_onSW2ButtonUpHdr)(void);
+*
+*/
+
 
 #ifndef LAB2_BUTTONS_H_
 #define LAB2_BUTTONS_H_

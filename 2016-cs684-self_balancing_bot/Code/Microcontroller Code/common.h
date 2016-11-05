@@ -1,9 +1,12 @@
 /*
- * common.h
- *
- *  Created on: Nov 2, 2016
- *      Author: Thor
- */
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: common.h
+* Functions			: None
+* Global Variables	: Defined below
+*
+*/
 
 #ifndef COMMON_H_
 #define COMMON_H_

@@ -1,9 +1,14 @@
 /*
- * qencoder.h
- *
- *  Created on: Oct 19, 2016
- *      Author: Thor
- */
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: qencoder.h
+* Functions			: void 		QE_init_qencoder(),
+* 				  	  int32_t 	QE_get_position(),
+* 				  	  int 		QE_get_speed()
+* Global Variables	: None
+*
+*/
 
 #ifndef QENCODER_H_
 #define QENCODER_H_

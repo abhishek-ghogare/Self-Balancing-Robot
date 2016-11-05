@@ -1,3 +1,16 @@
+/*
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: motor.c
+* Functions			: void 	MOT_init_motor(),
+* 				  	  void 	MOT_stop(),
+* 				  	  void 	MOT_forward(),
+* 				  	  void 	MOT_reverse(),
+* 				  	  void 	MOT_setSpeed(int32_t load)
+* Global Variables	: None
+*
+*/
 
 #include "motor.h"
 

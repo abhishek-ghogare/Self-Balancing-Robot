@@ -1,3 +1,13 @@
+/*
+*
+* Team Id			: self_balancing_bot
+* Author List		: Abhishek Ghogare
+* Filename			: mpu_9250.h
+* Functions			: None
+* Global Variables	: None
+*
+*/
+
 #ifndef MPU_9250_H_
 #define MPU_9250_H_
 
