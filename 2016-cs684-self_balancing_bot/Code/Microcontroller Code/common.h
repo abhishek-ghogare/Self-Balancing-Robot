@@ -1,10 +1,10 @@
 /*
 *
-* Team Id			: self_balancing_bot
-* Author List		: Abhishek Ghogare
-* Filename			: common.h
-* Functions			: None
-* Global Variables	: Defined below
+* Team Id           : self_balancing_bot
+* Author List       : Abhishek Ghogare
+* Filename          : common.h
+* Functions         : None
+* Global Variables  : Defined below
 *
 */
 
@@ -54,29 +54,29 @@
 #include "pid/pid.h"
 
 
-#define GYRO_SENSITIVITY 		131			// All angles are scaled by this factor for more accuracy
-#define ANGLE_SCALING_FACTOR 	100			// All angles are scaled by this factor for more accuracy
-#define BOT_START_ANGLE 		20			// Threshold angle to start bot, i.e. START bot if angle of inclination is between (-BOT_START_ANGLE, +BOT_START_ANGLE)
-#define BOT_STOP_ANGLE 			40			// Threshold angle to stop bot, i.e. STOP bot if angle of inclination is beyond (-BOT_STOP_ANGLE, +BOT_STOP_ANGLE)
-#define BOT_START_WAIT_COUNT	20			// Count till this number before STARTING the bot, count only when angle is between (-BOT_START_ANGLE, +BOT_START_ANGLE)
-#define BOT_STOP_WAIT_COUNT		50			// Count till this number before STOPPING the bot, count only when angle is between (-BOT_STOP_ANGLE, +BOT_STOP_ANGLE)
-#define PWM_OFFSET_LEFT_MOTOR	817			// Left motor starts moving at this pwm value, add this to final pwm value
-#define PWM_OFFSET_RIGHT_MOTOR	600			// Right motor starts moving at this pwm value, add this to final pwm value
-#define GYRO_OFFSET_Y			241			// Offset value of y component of gyroscope
-#define ANGLE_OFFSET			60
-#define MOTOR_MAX_SPEED			86284		// Speed of the encoder max, speed is in divisions per sec
+#define GYRO_SENSITIVITY        131         // All angles are scaled by this factor for more accuracy
+#define ANGLE_SCALING_FACTOR    100         // All angles are scaled by this factor for more accuracy
+#define BOT_START_ANGLE         20          // Threshold angle to start bot, i.e. START bot if angle of inclination is between (-BOT_START_ANGLE, +BOT_START_ANGLE)
+#define BOT_STOP_ANGLE          40          // Threshold angle to stop bot, i.e. STOP bot if angle of inclination is beyond (-BOT_STOP_ANGLE, +BOT_STOP_ANGLE)
+#define BOT_START_WAIT_COUNT    20          // Count till this number before STARTING the bot, count only when angle is between (-BOT_START_ANGLE, +BOT_START_ANGLE)
+#define BOT_STOP_WAIT_COUNT     50          // Count till this number before STOPPING the bot, count only when angle is between (-BOT_STOP_ANGLE, +BOT_STOP_ANGLE)
+#define PWM_OFFSET_LEFT_MOTOR   817         // Left motor starts moving at this pwm value, add this to final pwm value
+#define PWM_OFFSET_RIGHT_MOTOR  600         // Right motor starts moving at this pwm value, add this to final pwm value
+#define GYRO_OFFSET_Y           241         // Offset value of y component of gyroscope
+#define ANGLE_OFFSET            60
+#define MOTOR_MAX_SPEED         86284       // Speed of the encoder max, speed is in divisions per sec
 
-#define angPid_kp				20
-#define angPid_ki				3
-#define angPid_kd				0.3
+#define angPid_kp               20
+#define angPid_ki               3
+#define angPid_kd               0.3
 
-#define posPid_kp				0.03		// base value is 0.04, must be neaby this value
-#define posPid_ki				0.000
-#define posPid_kd				0.001
+#define posPid_kp               0.03        // base value is 0.04, must be neaby this value
+#define posPid_ki               0.000
+#define posPid_kd               0.001
 
-#define velPid_kp				0.01
-#define velPid_ki				0.0000000
-#define velPid_kd				0.0000000
+#define velPid_kp               0.01
+#define velPid_ki               0.0000000
+#define velPid_kd               0.0000000
 
 
 

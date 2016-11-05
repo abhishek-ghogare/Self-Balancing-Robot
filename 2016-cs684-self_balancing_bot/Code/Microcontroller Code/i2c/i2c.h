@@ -1,13 +1,13 @@
 /*
 *
-* Team Id			: self_balancing_bot
-* Author List		: Abhishek Ghogare
-* Filename			: i2c.h
-* Functions			: void 		I2C_init_I2C0(),
-* 				  	  void 		I2CSend(uint8_t slave_addr, uint8_t num_of_args, ...),
-* 				  	  void 		I2CSendString(uint32_t slave_addr, char array[]),
-* 				  	  uint32_t 	I2CReceive(uint32_t slave_addr, uint8_t reg)
-* Global Variables	: None
+* Team Id           : self_balancing_bot
+* Author List       : Abhishek Ghogare
+* Filename          : i2c.h
+* Functions         : void      I2C_init_I2C0(),
+*                     void      I2CSend(uint8_t slave_addr, uint8_t num_of_args, ...),
+*                     void      I2CSendString(uint32_t slave_addr, char array[]),
+*                     uint32_t  I2CReceive(uint32_t slave_addr, uint8_t reg)
+* Global Variables  : None
 *
 */
 

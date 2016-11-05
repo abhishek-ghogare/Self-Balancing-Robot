@@ -12,20 +12,20 @@ void Initialize(PID * pidp);
 
 #define DWT_O_CYCCNT 0x00000004
 void EnableTiming(void){
-	static int enabled = 0;
-	if (!enabled){
-	   HWREG(NVIC_DBG_INT) |= 0x01000000;    /*enable TRCENA bit in NVIC_DBG_INT*/
-	   HWREG(DWT_BASE + DWT_O_CYCCNT) = 0;   /* reset the counter */
-	   HWREG(DWT_BASE) |= 0x01;              /* enable the counter */
-	   enabled = 1;
-	 }
+  static int enabled = 0;
+  if (!enabled){
+     HWREG(NVIC_DBG_INT) |= 0x01000000;    /*enable TRCENA bit in NVIC_DBG_INT*/
+     HWREG(DWT_BASE + DWT_O_CYCCNT) = 0;   /* reset the counter */
+     HWREG(DWT_BASE) |= 0x01;              /* enable the counter */
+     enabled = 1;
+   }
 }
 uint64_t millis() {
-	uint64_t val = HWREG(DWT_BASE + DWT_O_CYCCNT);
-	val = val*1000;
-	val /= (uint64_t)(SysCtlClockGet());
+  uint64_t val = HWREG(DWT_BASE + DWT_O_CYCCNT);
+  val = val*1000;
+  val /= (uint64_t)(SysCtlClockGet());
 
-	return val; // at the beginning of the code
+  return val; // at the beginning of the code
 }
 
 /*Constructor (...)*********************************************************
@@ -36,19 +36,19 @@ PID PID_construct(double* Input, double* Output, double* Setpoint,
         double Kp, double Ki, double Kd, int ControllerDirection)
 {
 
-	PID pid;
+  PID pid;
 
-	EnableTiming();
+  EnableTiming();
 
     pid.output = Output;
     pid.input = Input;
     pid.setpoint = Setpoint;
     pid.inAuto = 0;
-	
-	PID_setOutputLimits(&pid, 0, 255);				//default output limit corresponds to
-												//the arduino pwm limits
+  
+  PID_setOutputLimits(&pid, 0, 255);        //default output limit corresponds to
+                        //the arduino pwm limits
 
-	pid.SampleTime = 10;							//default Controller Sample Time is 0.1 seconds
+  pid.SampleTime = 10;              //default Controller Sample Time is 0.1 seconds
 
     PID_setControllerDirection(&pid, ControllerDirection);
     PID_setTunings(&pid, Kp, Ki, Kd);
@@ -73,7 +73,7 @@ int PID_compute(PID * pidp)
    if(timeChange>=pidp->SampleTime)
    {
       /*Compute all the working error variables*/
-	  double input = *(pidp->input);
+    double input = *(pidp->input);
       double error = *(pidp->setpoint) - input;
       pidp->ITerm+= (pidp->ki * error);
       if(pidp->ITerm > pidp->outMax) pidp->ITerm= pidp->outMax;
@@ -83,14 +83,14 @@ int PID_compute(PID * pidp)
       /*Compute PID Output*/
       double output = pidp->kp * error + pidp->ITerm - pidp->kd * dInput;
       
-	  if(output > pidp->outMax) output = pidp->outMax;
+    if(output > pidp->outMax) output = pidp->outMax;
       else if(output < pidp->outMin) output = pidp->outMin;
-	  *(pidp->output) = output;
-	  
+    *(pidp->output) = output;
+    
       /*Remember some variables for next time*/
-	  pidp->lastInput = input;
+    pidp->lastInput = input;
       pidp->lastTime = now;
-	  return 1;
+    return 1;
    }
    else return 0;
 }
@@ -114,14 +114,14 @@ void PID_setTunings(PID *pidp, double Kp, double Ki, double Kd)
  
   if(pidp->controllerDirection == PID_REVERSE)
    {
-	  pidp->kp = (0 - pidp->kp);
-	  pidp->ki = (0 - pidp->ki);
-	  pidp->kd = (0 - pidp->kd);
+    pidp->kp = (0 - pidp->kp);
+    pidp->ki = (0 - pidp->ki);
+    pidp->kd = (0 - pidp->kd);
    }
 }
   
 /* SetSampleTime(...) *********************************************************
- * sets the period, in Milliseconds, at which the calculation is performed	
+ * sets the period, in Milliseconds, at which the calculation is performed  
  ******************************************************************************/
 void SetSampleTime(PID *pidp, int NewSampleTime)
 {
@@ -151,11 +151,11 @@ void PID_setOutputLimits(PID *pidp, double Min, double Max)
  
    if(pidp->inAuto)
    {
-	   if(*(pidp->output) > pidp->outMax) *(pidp->output) = pidp->outMax;
-	   else if(*(pidp->output) < pidp->outMin) *(pidp->output) = pidp->outMin;
-	 
-	   if(pidp->ITerm > pidp->outMax) pidp->ITerm = pidp->outMax;
-	   else if(pidp->ITerm < pidp->outMin) pidp->ITerm = pidp->outMin;
+     if(*(pidp->output) > pidp->outMax) *(pidp->output) = pidp->outMax;
+     else if(*(pidp->output) < pidp->outMin) *(pidp->output) = pidp->outMin;
+   
+     if(pidp->ITerm > pidp->outMax) pidp->ITerm = pidp->outMax;
+     else if(pidp->ITerm < pidp->outMin) pidp->ITerm = pidp->outMin;
    }
 }
 
@@ -175,15 +175,15 @@ void PID_setMode(PID *pidp, int Mode)
 }
  
 /* Initialize()****************************************************************
- *	does all the things that need to happen to ensure a bumpless transfer
+ *  does all the things that need to happen to ensure a bumpless transfer
  *  from manual to automatic mode.
  ******************************************************************************/ 
 void Initialize(PID *pidp)
 {
-	pidp->ITerm = *(pidp->output);
-	pidp->lastInput = *(pidp->input);
-	if(pidp->ITerm > pidp->outMax) pidp->ITerm = pidp->outMax;
-	else if(pidp->ITerm < pidp->outMin) pidp->ITerm = pidp->outMin;
+  pidp->ITerm = *(pidp->output);
+  pidp->lastInput = *(pidp->input);
+  if(pidp->ITerm > pidp->outMax) pidp->ITerm = pidp->outMax;
+  else if(pidp->ITerm < pidp->outMin) pidp->ITerm = pidp->outMin;
 }
 
 /* SetControllerDirection(...)*************************************************
@@ -196,9 +196,9 @@ void PID_setControllerDirection(PID *pidp, int Direction)
 {
    if(pidp->inAuto && Direction != pidp->controllerDirection)
    {
-	   pidp->kp = (0 - pidp->kp);
-	   pidp->ki = (0 - pidp->ki);
-	   pidp->kd = (0 - pidp->kd);
+     pidp->kp = (0 - pidp->kp);
+     pidp->ki = (0 - pidp->ki);
+     pidp->kd = (0 - pidp->kd);
    }   
    pidp->controllerDirection = Direction;
 }

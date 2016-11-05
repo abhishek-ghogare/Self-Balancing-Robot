@@ -1,14 +1,14 @@
 /*
 *
-* Team Id			: self_balancing_bot
-* Author List		: Abhishek Ghogare
-* Filename			: buttons.h
-* Functions			: void btn_initialize()
-* Global Variables	: void (*btn_onSW1ButtonDownHdr)(void);
-*					  void (*btn_onSW1ButtonUpHdr)(void);
-*					  void (*btn_onSW2ButtonDownHdr)(void);
-*					  void (*btn_onSW2ButtonUpHdr)(void);
-*					  char btn_sw1_state, btn_sw2_state
+* Team Id           : self_balancing_bot
+* Author List       : Abhishek Ghogare
+* Filename          : buttons.h
+* Functions         : void btn_initialize()
+* Global Variables  : void (*btn_onSW1ButtonDownHdr)(void);
+*                     void (*btn_onSW1ButtonUpHdr)(void);
+*                     void (*btn_onSW2ButtonDownHdr)(void);
+*                     void (*btn_onSW2ButtonUpHdr)(void);
+*                     char btn_sw1_state, btn_sw2_state
 *
 */
 
@@ -20,8 +20,8 @@
 
 // Button states
 // 0 : Idle
-// 1 : Press	:: first press
-// 2 : Release	:: still pressed
+// 1 : Press    :: first press
+// 2 : Release  :: still pressed
 char btn_sw1_state=0, btn_sw2_state=0;
 
 void btn_onSW1ButtonDown(void);
@@ -31,16 +31,16 @@ void btn_onSW2ButtonUp(void);
 
 
 /************************************************************************************
- * 	ALL Button UP/DOWN Handlers
+ *  ALL Button UP/DOWN Handlers
  *
  *
  ************************************************************************************/
 // Interrupt handler for all button down
 void btn_onButtonDown(void) {/*
     if (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_4) {
-    	btn_onSW1ButtonDown();
+        btn_onSW1ButtonDown();
     } else if (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_0) {
-    	btn_onSW2ButtonDown();
+        btn_onSW2ButtonDown();
     }*/
 
     if ( (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_4) && btn_sw1_state == 0)
@@ -58,16 +58,16 @@ void btn_onButtonDown(void) {/*
 
 // Interrupt handler for all button up
 void btn_onButtonUp(void) {
-	// Disabling up interrupt
+    // Disabling up interrupt
     if (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_4) {
-    	btn_onSW1ButtonUp();
+        btn_onSW1ButtonUp();
     } else if (GPIOIntStatus(GPIO_PORTF_BASE, false) & GPIO_PIN_0) {
-    	btn_onSW2ButtonUp();
+        btn_onSW2ButtonUp();
     }
 }
 
 /************************************************************************************
- * 	SW1 Button UP/DOWN Handlers
+ *  SW1 Button UP/DOWN Handlers
  *
  *
  ************************************************************************************/
@@ -78,8 +78,8 @@ void btn_onSW1ButtonDown(void) {
 
     if (btn_sw1_state == 0)
     {
-    	btn_sw1_state = 1;
-    	TimerEnable(TIMER0_BASE, TIMER_A);
+        btn_sw1_state = 1;
+        TimerEnable(TIMER0_BASE, TIMER_A);
     }
 }
 
@@ -88,12 +88,12 @@ void btn_onSW1ButtonUp(void) {
     GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_FALLING_EDGE); // Configure PF4 for falling edge trigger
     GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4);                      // Clear interrupt flag
 
-	TimerDisable(TIMER0_BASE, TIMER_A);
+    TimerDisable(TIMER0_BASE, TIMER_A);
     btn_sw1_state = 0; // Reset to idle state
 }
 
 /************************************************************************************
- * 	SW2 Button UP/DOWN Handlers
+ *  SW2 Button UP/DOWN Handlers
  *
  *
  ************************************************************************************/
@@ -104,8 +104,8 @@ void btn_onSW2ButtonDown(void) {
 
     if (btn_sw2_state == 0)
     {
-    	btn_sw2_state = 1;
-    	TimerEnable(TIMER0_BASE, TIMER_A);
+        btn_sw2_state = 1;
+        TimerEnable(TIMER0_BASE, TIMER_A);
     }
 }
 
@@ -114,68 +114,68 @@ void btn_onSW2ButtonUp(void) {
     GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_FALLING_EDGE); // Configure SW2 for falling edge trigger
     GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);                      // Clear interrupt flag
 
-	TimerDisable(TIMER0_BASE, TIMER_A);
+    TimerDisable(TIMER0_BASE, TIMER_A);
     btn_sw2_state = 0; // Reset to idle state
 }
 
 
 /************************************************************************************
- * 	Timer Interrupt Handlers
+ *  Timer Interrupt Handlers
  *
  *
  ************************************************************************************/
 void Timer0IntHandler(void)
 {
-	// Get button pressed status
+    // Get button pressed status
     int32_t sw1_pin4 = !GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4);
-	int32_t sw2_pin0 = !GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
-	// Clear the timer interrupt
-	TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-	// Read the current state of the GPIO pin and
-	// write back the opposite state
+    int32_t sw2_pin0 = !GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_0);
+    // Clear the timer interrupt
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    // Read the current state of the GPIO pin and
+    // write back the opposite state
 
-	if (btn_sw1_state == 1) {				// If sw1 button is in state 1, i.e. if sw1 was pressed 10ms earlier
-		if (sw1_pin4) {				        // If pin4 is low, i.e. if sw1 is pressed
-    		btn_sw1_state = 2;				// Go in sw1 button state 2
-    	    (*btn_onSW1ButtonDownHdr)();	// Execute the registered sw1 down handler by user
-    	} else {
-    		//btn_onSW1ButtonUp();			// Reset the button state
+    if (btn_sw1_state == 1) {               // If sw1 button is in state 1, i.e. if sw1 was pressed 10ms earlier
+        if (sw1_pin4) {                     // If pin4 is low, i.e. if sw1 is pressed
+            btn_sw1_state = 2;              // Go in sw1 button state 2
+            (*btn_onSW1ButtonDownHdr)();    // Execute the registered sw1 down handler by user
+        } else {
+            //btn_onSW1ButtonUp();          // Reset the button state
             if (btn_sw2_state==0)
-    	        TimerDisable(TIMER0_BASE, TIMER_A);
-    	    btn_sw1_state = 0; // Reset to idle state
-    	}
+                TimerDisable(TIMER0_BASE, TIMER_A);
+            btn_sw1_state = 0; // Reset to idle state
+        }
     }
-	else if (btn_sw1_state == 2 && !sw1_pin4) {		// If button was already in state 2 and pin4 is high now i.e. button is not pressed now
-	    (*btn_onSW1ButtonUpHdr)();			// Execute button up handler
-		//btn_onSW1ButtonUp();
-	    if (btn_sw2_state==0)
-	        TimerDisable(TIMER0_BASE, TIMER_A);
-	    btn_sw1_state = 0; // Reset to idle state				// Reset button state
-	}
+    else if (btn_sw1_state == 2 && !sw1_pin4) {     // If button was already in state 2 and pin4 is high now i.e. button is not pressed now
+        (*btn_onSW1ButtonUpHdr)();          // Execute button up handler
+        //btn_onSW1ButtonUp();
+        if (btn_sw2_state==0)
+            TimerDisable(TIMER0_BASE, TIMER_A);
+        btn_sw1_state = 0; // Reset to idle state               // Reset button state
+    }
 
-	if (btn_sw2_state == 1) {				// If sw2 button is in state 1, i.e. if sw2 was pressed 10ms earlier
-		if (sw2_pin0) {					    // If pin0 is low, i.e. if sw2 is pressed
-    		btn_sw2_state = 2;				// Go in sw2 button state 2
-    	    (*btn_onSW2ButtonDownHdr)();	// Execute the registered sw2 down handler by user
-    	} else {
-    		//btn_onSW2ButtonUp();			// Reset the button state
+    if (btn_sw2_state == 1) {               // If sw2 button is in state 1, i.e. if sw2 was pressed 10ms earlier
+        if (sw2_pin0) {                     // If pin0 is low, i.e. if sw2 is pressed
+            btn_sw2_state = 2;              // Go in sw2 button state 2
+            (*btn_onSW2ButtonDownHdr)();    // Execute the registered sw2 down handler by user
+        } else {
+            //btn_onSW2ButtonUp();          // Reset the button state
             if (btn_sw1_state==0)
                 TimerDisable(TIMER0_BASE, TIMER_A);
             btn_sw2_state = 0; // Reset to idle state
-    	}
+        }
     }
-	else if (btn_sw2_state == 2 && !sw2_pin0) {		// If button was already in state 2 and pin0 is high now i.e. button is not pressed now
-	    (*btn_onSW2ButtonUpHdr)();			// Execute button up handler
-		//btn_onSW2ButtonUp();				// Reset button state
+    else if (btn_sw2_state == 2 && !sw2_pin0) {     // If button was already in state 2 and pin0 is high now i.e. button is not pressed now
+        (*btn_onSW2ButtonUpHdr)();          // Execute button up handler
+        //btn_onSW2ButtonUp();              // Reset button state
         if (btn_sw1_state==0)
             TimerDisable(TIMER0_BASE, TIMER_A);
         btn_sw2_state = 0; // Reset to idle state               // Reset button state
-	}
+    }
 }
 
 
 /************************************************************************************
- * 	Button Initialization
+ *  Button Initialization
  *
  *
  ************************************************************************************/
@@ -207,12 +207,12 @@ void btn_initialize() {
 
 
     // Timer initialization
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);				// Enable the clock on the timer0 peripheral
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);			// Configure Timer0A to be periodic
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);               // Enable the clock on the timer0 peripheral
+    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);            // Configure Timer0A to be periodic
 
-    TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet() / 100) -1);	// Set timer to 10ms, subtracting 1 to make sure the interrupt is generated on 10th ms
+    TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet() / 100) -1);    // Set timer to 10ms, subtracting 1 to make sure the interrupt is generated on 10th ms
 
-    IntEnable(INT_TIMER0A);										// Enable Timer0A interrupt
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);			// Enable Timer0A interrupt on timeout event
-    IntMasterEnable();											// Enable master interrupts
+    IntEnable(INT_TIMER0A);                                     // Enable Timer0A interrupt
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);            // Enable Timer0A interrupt on timeout event
+    IntMasterEnable();                                          // Enable master interrupts
 }

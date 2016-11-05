@@ -1,13 +1,13 @@
 /*
 *
-* Team Id			: self_balancing_bot
-* Author List		: Abhishek Ghogare
-* Filename			: buttons.h
-* Functions			: void btn_initialize()
-* Global Variables	: void (*btn_onSW1ButtonDownHdr)(void);
-*					  void (*btn_onSW1ButtonUpHdr)(void);
-*					  void (*btn_onSW2ButtonDownHdr)(void);
-*					  void (*btn_onSW2ButtonUpHdr)(void);
+* Team Id           : self_balancing_bot
+* Author List       : Abhishek Ghogare
+* Filename          : buttons.h
+* Functions         : void btn_initialize()
+* Global Variables  : void (*btn_onSW1ButtonDownHdr)(void);
+*                     void (*btn_onSW1ButtonUpHdr)(void);
+*                     void (*btn_onSW2ButtonDownHdr)(void);
+*                     void (*btn_onSW2ButtonUpHdr)(void);
 *
 */
 
